@@ -1,4 +1,4 @@
-read.fits = function(file, hdu = 0, comments = TRUE, strip = c(" ","'"," ")){
+read.fits = function(file, hdu = 0, comments = TRUE, strip = c(" ","'"," "), xlo = NA, xhi = NA, ylo = NA, yhi = NA){
     
     # open file
     fcon = file(file, "rb")
@@ -7,7 +7,7 @@ read.fits = function(file, hdu = 0, comments = TRUE, strip = c(" ","'"," ")){
     hdr = .read.fits.hdr(fcon, comments=comments, strip=strip)
     
     # read primary data unit
-    du = .read.fits.image(fcon, hdr)
+    du = .read.fits.image(fcon, hdr, xlo, xhi, ylo, yhi)
     
     # master files
     hlist = list(hdr)
@@ -36,7 +36,7 @@ read.fits = function(file, hdu = 0, comments = TRUE, strip = c(" ","'"," ")){
             if(length(grep("BINTABLE",hdr[which(hdr[,"key"]=="XTENSION"),"value"]))>0){
                 du = .read.fits.table(fcon, hdr)
             }else{
-                du = .read.fits.image(fcon, hdr)
+                du = .read.fits.image(fcon, hdr, xlo, xhi, ylo, yhi)
             }
             
             # add to masters
@@ -128,10 +128,10 @@ read.fitskey = function(key, file, hdu = 1){
     
 }
 
-read.fitsim = function(file, hdu = 1){
+read.fitsim = function(file, hdu = 1, xlo = NA, xhi = NA, ylo = NA, yhi = NA){
     
     # read and return FITS image
-    dat = read.fits(file, hdu=hdu, comments=FALSE)
+    dat = read.fits(file, hdu=hdu, comments=FALSE, xlo=xlo, xhi=xhi, ylo=ylo, yhi=yhi)
     return(dat$dat[[1]])
     
 }
@@ -236,7 +236,7 @@ read.fitstab = function(file, hdu=2){
     
 }
 
-.read.fits.image = function(fcon, hdr){
+.read.fits.image = function(fcon, hdr, xlo, xhi, ylo, yhi){
     
     # choose data precision type
     switch(hdr[which(hdr[,"key"]=="BITPIX"),"value"], "-64" = {
@@ -275,12 +275,47 @@ read.fitstab = function(file, hdu=2){
         }
         
         # read image data
-        dat = array(readBin(fcon, what = btype, n = records, size = bsize, signed = bsign, endian = "big"), dim = naxisn)
+        subregion = FALSE
+        if(!is.na(xlo) & !is.na(xhi) & !is.na(ylo) & !is.na(yhi)){
+            xcols = xlo:xhi
+            ycols = ylo:yhi
+            if(prod(naxisn) != prod(c(length(xcols),length(ycols)))){
+                subregion = TRUE
+            }
+        }
+        if(subregion){
+            start = (naxisn[1] * (ylo - 1)) + (xlo - 1)
+            if(start != 0){seek(fcon, where = start*bsize, origin = "current")}
+            dat = {}
+            for(row in 1:length(ycols)){
+                temp = readBin(fcon, what = btype, n = length(xcols), size = bsize, signed = bsign, endian = "big")
+                dat = cbind(dat, temp)
+                if(row != yhi){
+                    seek(fcon, where = (naxisn[1] - length(xcols)) * bsize, origin = "current")
+                }
+            }
+            finish = (naxisn[1] * (naxisn[2] - yhi)) + (naxisn[1] - xhi)
+            if(finish != 0){seek(fcon, where = finish*bsize, origin = "current")}
+        }else{
+            dat = array(readBin(fcon, what = btype, n = records, size = bsize, signed = bsign, endian = "big"), dim = naxisn)
+        }
         
         # finish reading block to allow reading next hdu (if exists)
         nbyte = records * bsize
         nbyte = ifelse(nbyte%%2880 == 0, 0, 2880 - nbyte%%2880)
         temp = readBin(fcon, what = 'raw', n = nbyte)
+        
+        # scale image to physical units if needed
+        temp = hdr[which(hdr[,"key"] == "BUNIT"),"value"]
+        BUNIT = ifelse(length(temp) != 1, "", temp)
+        temp = hdr[which(hdr[,"key"] == "BSCALE"),"value"]
+        BSCALE = ifelse(length(temp) != 1, 1, as.numeric(temp))
+        temp = hdr[which(hdr[,"key"] == "BZERO"),"value"]
+        BZERO = ifelse(length(temp) != 1, 0, as.numeric(temp))
+        if(BSCALE != 1 || BZERO != 0){
+            dat = dat * BSCALE + BZERO
+        }
+        
     }else{
         dat = NULL
     }

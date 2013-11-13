@@ -1,5 +1,5 @@
 aplot = function(x, y = NULL, z = NULL, xlim = NULL, ylim = NULL, zlim = NULL, xlab = NULL, ylab = NULL, zlab = NULL, col = NULL, axes = TRUE, side = 1:4, labels = TRUE, majticks = TRUE, minticks = TRUE, nxmaj = NULL, nymaj = NULL, nxmin = NULL, nymin = NULL, xat = NULL, yat = NULL, log = "", unlog = FALSE, xformat = NULL, yformat = NULL, digits = 0, cex = 1, xlabpos = 1, ylabpos = 2, zcol = NULL, cb = FALSE, cbpos = 4, cbsep = 1.5, cbspan = 2, cbinset = 1, cbx1 = NULL, cbx2 = NULL, cby1 = NULL, cby2 = NULL, cblegend = NULL, cbsteps = 250, las = 0, mgp = c(2.5,0.5,0), tcl = 0.5, dexcl = 0.2, cex.axis = 1, cex.cb = 1, zline = mgp[1]+1, col.axes = "black", col.axis = "black", add = FALSE, type = NULL, bgcol = NULL, ...){
-    #y=NULL; z=NULL; xlim=NULL; ylim=NULL; zlim=NULL; xlab=NULL; ylab=NULL; zlab=NULL; col=NULL; axes=TRUE; side=1:4; labels=TRUE; majticks=TRUE; minticks=TRUE; nxmaj=NULL; nymaj=NULL; nxmin=NULL; nymin=NULL; xat = NULL; yat = NULL; log=""; unlog=FALSE; xformat = NULL; yformat = NULL; digits=0; cex=1; xlabpos=1; ylabpos=2; zcol=NULL; cb=FALSE; cbpos=4; cbsep=1.5; cbspan=2; cbinset=1; cbx1=NULL; cbx2=NULL; cby1=NULL; cby2=NULL; cblegend=NULL; cbsteps=250; las=0; mgp=c(2.5,0.5,0); tcl=0.5; dexcl=0.2; cex.axis=1; cex.cb=1; zline=mgp[1]+1; col.axes="black"; col.axis="black"; add=FALSE; type=NULL; bgcol=NULL
+    #y = NULL; z = NULL; xlim = NULL; ylim = NULL; zlim = NULL; xlab = NULL; ylab = NULL; zlab = NULL; col = NULL; axes = TRUE; side = 1:4; labels = TRUE; majticks = TRUE; minticks = TRUE; nxmaj = NULL; nymaj = NULL; nxmin = NULL; nymin = NULL; xat = NULL; yat = NULL; log = ""; unlog = FALSE; xformat = NULL; yformat = NULL; digits = 0; cex = 1; xlabpos = 1; ylabpos = 2; zcol = NULL; cb = FALSE; cbpos = 4; cbsep = 1.5; cbspan = 2; cbinset = 1; cbx1 = NULL; cbx2 = NULL; cby1 = NULL; cby2 = NULL; cblegend = NULL; cbsteps = 250; las = 0; mgp = c(2.5,0.5,0); tcl = 0.5; dexcl = 0.2; cex.axis = 1; cex.cb = 1; zline = mgp[1]+1; col.axes = "black"; col.axis = "black"; add = FALSE; type = NULL; bgcol = NULL
     
     # unlog
     if(unlog!="FALSE" & unlog!="F"){
@@ -40,7 +40,6 @@ aplot = function(x, y = NULL, z = NULL, xlim = NULL, ylim = NULL, zlim = NULL, x
     # colour bar
     parmarorig = temp = par("mar")
     if(cb){
-        require(plotrix,quietly=TRUE)
         #extramar=0
         #if(!is.null(zlab)){extramar=extramar+1}
         #if(cbpos==1){extramar = extramar+0
@@ -119,13 +118,13 @@ aplot = function(x, y = NULL, z = NULL, xlim = NULL, ylim = NULL, zlim = NULL, x
     # plot
     if(!add){
         if(class(x)=="density"){
-            temp = plot.density(x, y=NULL, xlim=xlim, ylim=ylim, xlab=xlab, ylab=ylab, axes=FALSE, las=las, mgp=mgp, tcl=tcl, col=col, cex=cex, type=type, log=log, ...)
+            temp = plot(x, y=NULL, xlim=xlim, ylim=ylim, xlab=xlab, ylab=ylab, axes=FALSE, las=las, mgp=mgp, tcl=tcl, col=col, cex=cex, type=type, log=log, ...)
         }else{
             temp = plot(x, y, xlim=xlim, ylim=ylim, xlab=xlab, ylab=ylab, axes=FALSE, las=las, mgp=mgp, tcl=tcl, col=col, cex=cex, type=type, log=log, ...)
         }
     }else{
         if(class(x)=="density"){
-            plot.density(x, y=NULL, col=col, cex=cex, add=TRUE, type=type, log=log, xlab=xlab, ylab=ylab, ...)
+            plot(x, y=NULL, col=col, cex=cex, add=TRUE, type=type, log=log, xlab=xlab, ylab=ylab, ...)
         }else if(class(x)=="function"){
             plot(x, y, col=col, cex=cex, add=TRUE, type=type, log=log, ...)
         }else{
@@ -141,7 +140,7 @@ aplot = function(x, y = NULL, z = NULL, xlim = NULL, ylim = NULL, zlim = NULL, x
         if(par("ylog")){yrect=10^yrect}
         rect(xrect[1], yrect[1], xrect[2], yrect[2], col=bgcol, border=bgcol)
         if(class(x)=="density"){
-            plot.density(x, y=NULL, col=col, cex=cex, add=TRUE, type=type2, log=log, xlab=xlab, ylab=ylab, ...)
+            plot(x, y=NULL, col=col, cex=cex, add=TRUE, type=type2, log=log, xlab=xlab, ylab=ylab, ...)
         }else{
             if(!is.null(temp)){x = temp$x; y = temp$y}
             points(x, y, col=col, cex=cex, type=type2, ...)

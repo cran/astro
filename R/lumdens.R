@@ -1,4 +1,4 @@
-lumdens = function(knee, slope, norm, msun = solar("r"), mag = TRUE){
+lumdens = function(knee, slope, norm, msun = solar("r"), mag = TRUE, log = FALSE){
     
     # check inputs have same length (for double schechter fits)
     if(any(is.na(knee))){knee = knee[-which(is.na(knee))]}
@@ -15,7 +15,11 @@ lumdens = function(knee, slope, norm, msun = solar("r"), mag = TRUE){
     if(mag){
         j = norm * (10^(-0.4*(knee-msun))) * gamma(slope+2)
     }else{
-        j = norm * knee * gamma(slope+2)
+        if(log){
+            j = norm * (10^knee) * gamma(slope+2)
+        }else{
+            j = norm * knee * gamma(slope+2)
+        }
     }
     
     # return results

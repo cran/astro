@@ -15,8 +15,7 @@
               fixn2 = FALSE, range = range(data), lim1 = NA, lim2 = NA, 
               numlim = 1, method = "nlminb", volume = 1, bw = 0.1, 
               mag = FALSE, log = FALSE, null = 1E-9, error = "jack", 
-              numproc = 1, subvol = 10, sampnum = subvol, 
-              msun = solar("r"), ...)}
+              subvol = 10, sampnum = subvol, msun = solar("r"), ...)}
 
 \arguments{
   \item{data}{input data vector}
@@ -49,7 +48,6 @@
   \item{log}{are the input data logged?}
   \item{null}{value of null}
   \item{error}{parameter error estimation method [jack/boot]}
-  \item{numproc}{number of processors to use in error estimation}
   \item{subvol}{number of sub-volumes to split the input data into}
   \item{sampnum}{number of samplings to be made for bootstrapping method}
   \item{msun}{absolute magnitude of the sun (to be used in calculation of the luminosity density should mag=TRUE)}
@@ -66,6 +64,9 @@
   \item{par}{best fit parameters}
   \item{parlo}{lower error estimates on recovered fit parameters}
   \item{parhi}{upper error estimates on recovered fit parameters}
+  \item{j}{luminosity density}
+  \item{jlo}{lower luminosity density limit}
+  \item{jhi}{upper luminosity density limit}
   \item{chi2}{chi2 value}
   \item{dof}{number of degrees of freedom}
   \item{rchi2}{reduced chi2}

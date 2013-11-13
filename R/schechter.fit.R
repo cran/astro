@@ -1,15 +1,12 @@
-schechter.fit = function(data, knee, slope, norm, knee.alt = NA, slope.alt = NA, norm.alt = NA, kneelo = -Inf, slopelo = -Inf, normlo = 0, kneehi = Inf, slopehi = Inf, normhi = Inf, fixk1 = FALSE, fixs1 = FALSE, fixn1 = FALSE, fixk2 = FALSE, fixs2 = FALSE, fixn2 = FALSE, range = range(data), lim1 = NA, lim2 = NA, numlim = 1, method = "nlminb", volume = 1, bw = 0.1, mag = FALSE, log = FALSE, null = 1E-9, error = "jack", numproc = 1, subvol = 10, sampnum = subvol, msun = solar("r"), ...){
-    
-    #load("../vollim.img"); data=dat[dat[,"R_SERSIC"]>-50,"R_SERSIC"]; knee=-20; slope=c(-1,-0.5); norm=c(1e-3,1e-3); knee.alt = NA; slope.alt = NA; norm.alt = NA; kneelo = -Inf; slopelo = -Inf; normlo = 0; kneehi = Inf; slopehi = Inf; normhi = Inf; fixk1 = FALSE; fixs1 = FALSE; fixn1 = FALSE; fixk2 = FALSE; fixs2 = FALSE; fixn2 = FALSE; range=c(-18,-24); lim1=NA; lim2=NA; numlim=1; method = "nlminb"; volume=224555.3; bw=0.25; mag=TRUE; log=FALSE; null=1e-9; error="jack"; numproc=5; subvol=10; sampnum=subvol; msun=solar("r")
-    
-    #load("../vollim.img")
-    #fit = schechter.fit(data=dat[dat[,"R_SERSIC"]>-50,"R_SERSIC"], knee=-20, slope=-1, norm=1e-3, range=c(-24,-15), lim1=-17.4, volume=224555.3, bw=0.25, mag=TRUE)
-    #sch = schechter(x=fit$bin, knee=fit$par["k1"], slope=fit$par["s1"], norm=fit$par["n1"], bw=0.25, mag=TRUE)
-    #suppressWarnings(aplot(fit$bin, fit$den, log="y", ylim=c(1e-5,1e-2), pch=17))
-    #lines(fit$bin, sch)
+schechter.fit = function(data, knee, slope, norm, knee.alt = NA, slope.alt = NA, norm.alt = NA, kneelo = -Inf, slopelo = -Inf, normlo = 0, kneehi = Inf, slopehi = Inf, normhi = Inf, fixk1 = FALSE, fixs1 = FALSE, fixn1 = FALSE, fixk2 = FALSE, fixs2 = FALSE, fixn2 = FALSE, range = range(data), lim1 = NA, lim2 = NA, numlim = 1, method = "nlminb", volume = 1, bw = 0.1, mag = FALSE, log = FALSE, null = 1E-9, error = "jack", subvol = 10, sampnum = subvol, msun = solar("r"), ...){
     
     # setup
     range = sort(range)
+    
+#    # export
+#    .schechter.fit.bin = astro:::.schechter.fit.bin
+#    .schechter.fit.dat = astro:::.schechter.fit.dat
+#    .schechter.fit.chi = astro:::.schechter.fit.chi
     
     # schechter bin calculations
     bindat = .schechter.fit.bin(data=data, range=range, lim1=lim1, lim2=lim2, numlim=numlim, volume=volume, bw=bw, null=null)
@@ -26,169 +23,32 @@ schechter.fit = function(data, knee, slope, norm, knee.alt = NA, slope.alt = NA,
             subvols = round(seq(1,(length(data)+1),len=subvol+1))
             jacklist = 1:subvol
             
-            if(numproc<=1){
+            cat("\n")
+            
+            for(l in jacklist){
                 
-                cat("\n")
+                # setup
+                cat("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b",l,"/",(length(subvols)-1),"")
+                jackdat = data[-(subvols[l]:subvols[l+1])]
                 
-                for(l in jacklist){
-                    
-                    # setup
-                    cat("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b",l,"/",(length(subvols)-1),"")
-                    jackdat = data[-(subvols[l]:subvols[l+1])]
-                    
-                    # jackknifed binned data
-                    jackbin = .schechter.fit.bin(data=jackdat, range=range, lim1=lim1, lim2=lim2, numlim=numlim, volume=volume, bw=bw, null=null)
-                    
-                    # jackknifed fitted data
-                    jackfit = .schechter.fit.dat(bindat=jackbin, knee=knee, slope=slope, norm=norm, knee.alt=knee.alt, slope.alt=slope.alt, norm.alt=norm.alt, kneelo=kneelo, slopelo=slopelo, normlo=normlo, kneehi=kneehi, slopehi=slopehi, normhi=normhi, method=method, bw=bw, mag=mag, log=log, fixk1=fixk1, fixs1=fixs1, fixn1=fixn1, fixk2=fixk2, fixs2=fixs2, fixn2=fixn2, msun=msun)
-                    
-                    # add par to results
-                    if(l==jacklist[1]){
-                        pars = jackfit$par
-                        js = jackfit$j
-                        chi2s = jackfit$chi2
-                        rchi2s = jackfit$rchi2
-                    }else{
-                        pars = rbind(pars, jackfit$par)
-                        js = c(js, jackfit$j)
-                        chi2s = c(chi2s, jackfit$chi2)
-                        rchi2s = c(rchi2s, jackfit$rchi2)
-                    }
-                    
+                # jackknifed binned data
+                jackbin = .schechter.fit.bin(data=jackdat, range=range, lim1=lim1, lim2=lim2, numlim=numlim, volume=volume, bw=bw, null=null)
+                
+                # jackknifed fitted data
+                jackfit = .schechter.fit.dat(bindat=jackbin, knee=knee, slope=slope, norm=norm, knee.alt=knee.alt, slope.alt=slope.alt, norm.alt=norm.alt, kneelo=kneelo, slopelo=slopelo, normlo=normlo, kneehi=kneehi, slopehi=slopehi, normhi=normhi, method=method, bw=bw, mag=mag, log=log, fixk1=fixk1, fixs1=fixs1, fixn1=fixn1, fixk2=fixk2, fixs2=fixs2, fixn2=fixn2, msun=msun)
+                
+                # add par to results
+                if(l==jacklist[1]){
+                    pars = jackfit$par
+                    js = jackfit$j
+                    chi2s = jackfit$chi2
+                    rchi2s = jackfit$rchi2
+                }else{
+                    pars = rbind(pars, jackfit$par)
+                    js = c(js, jackfit$j)
+                    chi2s = c(chi2s, jackfit$chi2)
+                    rchi2s = c(rchi2s, jackfit$rchi2)
                 }
-                
-            }else{
-                
-                # create master script
-                cat('#!/usr/bin/Rscript --no-init-file
-
-# setup
-require("astro", quietly=TRUE)
-
-# load input
-inputargs = commandArgs(TRUE)
-fin = inputargs[1]
-fout = inputargs[2]
-load(fin)
-
-cat("\\n")
-
-for(l in jacklist){
-    
-    # setup
-    cat("\\b\\b\\b\\b\\b\\b\\b\\b\\b\\b\\b\\b\\b\\b\\b\\b\\b\\b\\b\\b\\b",l,"/",(length(subvols)-1),"")
-    jackdat = data[-(subvols[l]:subvols[l+1])]
-    
-    # jackknifed binned data
-    jackbin = .schechter.fit.bin(data=jackdat, range=range, lim1=lim1, lim2=lim2, numlim=numlim, volume=volume, bw=bw, null=null)
-    
-    # jackknifed fitted data
-    jackfit = .schechter.fit.dat(bindat=jackbin, knee=knee, slope=slope, norm=norm, knee.alt=knee.alt, slope.alt=slope.alt, norm.alt=norm.alt, kneelo=kneelo, slopelo=slopelo, normlo=normlo, kneehi=kneehi, slopehi=slopehi, normhi=normhi, method=method, bw=bw, mag=mag, log=log, fixk1=fixk1, fixs1=fixs1, fixn1=fixn1, fixk2=fixk2, fixs2=fixs2, fixn2=fixn2, msun=msun)
-    
-    # add par to results
-    if(l==jacklist[1]){
-        pars = jackfit$par
-        js = jackfit$j
-        chi2s = jackfit$chi2
-        rchi2s = jackfit$rchi2
-    }else{
-        pars = rbind(pars, jackfit$par)
-        js = c(js, jackfit$j)
-        chi2s = c(chi2s, jackfit$chi2)
-        rchi2s = c(rchi2s, jackfit$rchi2)
-    }
-    
-}
-
-# write results to output file
-save(pars, js, chi2s, rchi2s, file=fout)
-
-', file='schechter-fit-multi.R', sep='')
-                
-                # make master script executable
-                system("chmod +x schechter-fit-multi.R")
-                
-                # Open Master screen
-                system(paste("/usr/bin/screen -dmS schecfit -t sch", sep=""))
-                
-                i = 1
-                
-                # create sub-proc files
-                splits = round(seq(1,(length(jacklist)+1),len=numproc+1))
-                ins = {}
-                outs = {}
-                for(i in 1:numproc){
-                    
-                    # file name
-                    cwd = getwd()
-                    fin = paste(cwd,"/schecfit-", formatC(i,width=2,flag=0), ".img", sep="")
-                    fout = paste(cwd,"/schecfit-res-", formatC(i,width=2,flag=0), ".img", sep="")
-                    ins = c(ins, fin)
-                    outs = c(outs, fout)
-                    
-                    # backups
-                    jacklist2=jacklist
-                    knee2=knee; slope2=slope; norm2=norm
-                    knee.alt2=knee.alt; slope.alt2=slope.alt; norm.alt2=norm.alt
-                    
-                    # create portable image
-                    jacklist = jacklist[(splits[i]):(splits[i+1]-1)]
-                    knee = as.numeric(fitdat$par[grep("k",names(fitdat$par))])
-                    slope = as.numeric(fitdat$par[grep("s",names(fitdat$par))])
-                    norm = as.numeric(fitdat$par[grep("n",names(fitdat$par))])
-                    knee.alt=NA; slope.alt=NA; norm.alt=NA
-                    save(data, subvols, jacklist, range, lim1, lim2, numlim, volume, bw, null, knee, slope, norm, knee.alt, slope.alt, norm.alt, kneelo, slopelo, normlo, kneehi, slopehi, normhi, method, mag, log, fixk1, fixs1, fixn1, fixk2, fixs2, fixn2, msun, file=fin)
-                    
-                    # restore
-                    jacklist=jacklist2
-                    knee=knee2; slope=slope2; norm=norm2
-                    knee.alt=knee.alt2; slope.alt=slope.alt2; norm.alt=norm.alt2
-                    
-                    # multi-process
-                    multicommand = paste("/usr/bin/screen -S schecfit -X screen -t p", formatC(i,width=2,flag=0), " ", cwd, "/schechter-fit-multi.R ", fin, " ", fout, sep="")
-                    system(multicommand)
-                    
-                }
-                
-                # while loop wait
-                while(sum(file.exists(outs))!=sum(file.exists(ins))){
-                    cat("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b", sum(file.exists(outs)), "/", sum(file.exists(ins)), "")
-                    Sys.sleep(3)
-                }
-                cat("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b", sum(file.exists(outs)), "/", sum(file.exists(ins)),"\n")
-                
-                # kill master screen
-                system(paste("/usr/bin/screen -S schecfit -X quit", sep=""))
-                
-                # collect results
-                for(i in 1:length(outs)){
-                    
-                    # load results
-                    load(outs[i])
-                    
-                    # save results
-                    if(i==1){
-                        allpars = pars
-                        alljs = js
-                        allchi2s = chi2s
-                        allrchi2s = rchi2s
-                    }else{
-                        allpars = rbind(allpars,pars)
-                        alljs = c(alljs,js)
-                        allchi2s = c(allchi2s,chi2s)
-                        allrchi2s = c(allrchi2s,rchi2s)
-                    }
-                    
-                }
-                pars = allpars
-                js = alljs
-                chi2s = allchi2s
-                rchi2s = allrchi2s
-                
-                # clean up multi mess
-                unlink(ins)
-                unlink(outs)
-                unlink("schechter-fit-multi.R")
                 
             }
             
@@ -337,7 +197,7 @@ save(pars, js, chi2s, rchi2s, file=fout)
         if(fixn2){fit$par = c(fit$par,fixvars["n2"])}
         
         # calculate luminosity density
-        j = lumdens(knee=as.numeric(fit$par[grep("k",names(fit$par))]), slope=as.numeric(fit$par[grep("s",names(fit$par))]), norm=as.numeric(fit$par[grep("n",names(fit$par))]), msun=msun, mag=mag)
+        j = lumdens(knee=as.numeric(fit$par[grep("k",names(fit$par))]), slope=as.numeric(fit$par[grep("s",names(fit$par))]), norm=as.numeric(fit$par[grep("n",names(fit$par))]), msun=msun, mag=mag, log=log)
         
         # collect results
         chis = c(chis, fit$value)

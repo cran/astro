@@ -10,7 +10,6 @@ acb = function(zlim = NULL, zlab = NULL, unlog = FALSE, cex = 1, zcol = NULL, cb
     
     # colour bar
     parmarorig = temp = par("mar")
-    require(plotrix,quietly=TRUE)
     extramar=0
     if(!is.null(zlab)){extramar=extramar+1}
     if(cbpos==1){extramar = extramar+0

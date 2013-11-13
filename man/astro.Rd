@@ -106,6 +106,10 @@ Astro qbeta function: \code{\link{aqbeta}},
 
 Astro alpha-transparency colour conversion: \code{\link{acol}},
 
+The Gaussian Function: \code{\link{gauss}},
+
+Fit to the Gaussian Function: \code{\link{gauss.fit}},
+
 The Schechter Function: \code{\link{schechter}},
 
 Fit to the Schechter Function: \code{\link{schechter.fit}},
@@ -115,6 +119,8 @@ Error ellipses for a Schechter fit: \code{\link{schechter.ellipse}},
 Absolute Magnitude of the Sun: \code{\link{solar}},
 
 The Luminosity Density: \code{\link{lumdens}},
+
+Central Angle: \code{\link{cenang}},
 
 Ellipse: \code{\link{ellipse}},
 

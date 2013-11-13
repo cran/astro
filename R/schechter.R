@@ -71,18 +71,21 @@ schechter = function(x, knee, slope, norm, bw = 0.1, mag = FALSE, log = FALSE, .
     for(i in 1:length(x)){
         
         if(mag){
+            # magnitudes
             if(max(lengths)==1){
                 temp = integrate(funcmag1, lower=stepslo[i], upper=stepshi[i], k=knee[1], s=slope[1], n=norm[1], ...)
             }else{
                 temp = integrate(funcmag2, lower=stepslo[i], upper=stepshi[i], k1=knee[1], s1=slope[1], n1=norm[1], k2=knee[2], s2=slope[2], n2=norm[2], ...)
             }
         }else if(log){
+            # logged
             if(max(lengths)==1){
                 temp = integrate(funclog1, lower=stepslo[i], upper=stepshi[i], k=knee[1], s=slope[1], n=norm[1], ...)
             }else{
                 temp = integrate(funclog2, lower=stepslo[i], upper=stepshi[i], k1=knee[1], s1=slope[1], n1=norm[1], k2=knee[2], s2=slope[2], n2=norm[2], ...)
             }
         }else{
+            # linear
             if(max(lengths)==1){
                 temp = integrate(funclin1, lower=stepslo[i], upper=stepshi[i], k=knee[1], s=slope[1], n=norm[1], ...)
             }else{
@@ -90,6 +93,7 @@ schechter = function(x, knee, slope, norm, bw = 0.1, mag = FALSE, log = FALSE, .
             }
         }
         phi = c(phi, temp$value)
+        
     }
     
     # return data

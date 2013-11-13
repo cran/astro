@@ -18,7 +18,7 @@ The mid-level function 'read.fitskey' is a wrapper around 'read.fits', and provi
 }
 
 \value{
-A vector of data equal in length to the input key request. NA is returned ehere no keys have been found.
+A vector of data equal in length to the input key request. NA is returned where no keys have been found.
 }
 
 \author{

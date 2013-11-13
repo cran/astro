@@ -52,7 +52,9 @@ par("oma"=c(5.1,0,2.1,0))
 
 # surface brightness plot
 mu = convmu(r=r, mu=20, re=1, n=ns[1])
-aplot(r,abs(mu), ylim=c(28,12), type="l", nxmaj=5, nxmin=1, nymin=4, xlab="", ylab=bquote(paste(mu," / mag ", arcsec^{-2})), xaxs="i", yaxs="i", las=1, col=col[1], labels=2)
+aplot(r,abs(mu), ylim=c(28,12), type="l", nxmaj=5, nxmin=1, nymin=4, xlab="", 
+ylab=bquote(paste(mu," / mag ", arcsec^{-2})), xaxs="i", yaxs="i", las=1, 
+col=col[1], labels=2)
 for(i in 2:length(ns)){
     mu = convmu(r=r, mu=20, re=1, n=ns[i])
     lines(r, abs(mu), col=col[i])
@@ -65,7 +67,8 @@ box()
 
 # magnitude difference plot
 md = sersic(mag=0, re=1, n=ns[1], r=r)$magdiff
-aplot(r,abs(md), ylim=c(0,3), type="l", nxmaj=5, nxmin=1, nymaj=4, nymin=4, xlab="", ylab="m (< r) / mag", xaxs="i", yaxs="i", las=1, col=col[1])
+aplot(r,abs(md), ylim=c(0,3), type="l", nxmaj=5, nxmin=1, nymaj=4, nymin=4, 
+xlab="", ylab="m (< r) / mag", xaxs="i", yaxs="i", las=1, col=col[1])
 for(i in 2:length(ns)){
     md = sersic(mag=0, re=1, n=ns[i], r=r)$magdiff
     lines(r, abs(md), col=col[i])

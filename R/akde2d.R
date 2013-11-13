@@ -1,5 +1,4 @@
 akde2d = function(x, y, n = 25, lims = c(range(x), range(y)), levels = seq(0,0.9,by=0.1), ...){
-    require(MASS,quietly=TRUE)
     adens = kde2d(x, y, n=n, lims=lims, ...)
     asort = sort(as.numeric(adens$z))
     asum=sum(asort)
