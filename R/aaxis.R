@@ -49,7 +49,7 @@ aaxis = function(side = 1, at = NULL, labels = TRUE, majticks = TRUE, minticks =
     # rounding & backup
     #ticks = signif(ticks,digits=9)
     #ticks = round(ticks,digits=9)
-    if(abs((majmax-majmin))>1E-14){if(any(abs(ticks)<1E-14)){ticks[abs(ticks)<1E-14]=0}}
+    if(abs((majmax-majmin))>1E-31){if(any(abs(ticks)<1E-31)){ticks[abs(ticks)<1E-31]=0}}
     axticks = ticks
     
     # define labels
@@ -176,8 +176,8 @@ aaxis = function(side = 1, at = NULL, labels = TRUE, majticks = TRUE, minticks =
         }
         
         # rounding
-        if(any(abs(mticks)<9E-14) & abs(mticks[length(mticks)]-mticks[1])>1E-12){
-            mticks[which(abs(mticks)<9E-14)]=0
+        if(any(abs(mticks)<9E-31) & abs(mticks[length(mticks)]-mticks[1])>1E-12){
+            mticks[which(abs(mticks)<9E-31)]=0
         }
         
         # rounding

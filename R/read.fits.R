@@ -1,13 +1,28 @@
-read.fits = function(file, hdu = 0, comments = TRUE, strip = c(" ","'"," "), xlo = NA, xhi = NA, ylo = NA, yhi = NA){
+read.fits = function(file, hdu = 0, comments = TRUE, strip = c(" ","'"," "), maxlines = 50000, xlo = NA, xhi = NA, ylo = NA, yhi = NA){
     
     # open file
     fcon = file(file, "rb")
     
     # read primary header
-    hdr = .read.fits.hdr(fcon, comments=comments, strip=strip)
+    hdr = .read.fits.hdr(fcon, comments=comments, strip=strip, maxlines=maxlines)
     
     # read primary data unit
     du = .read.fits.image(fcon, hdr, xlo, xhi, ylo, yhi)
+    
+    # correct hdr for WCS information if present and if cutting image
+    wcspix = as.numeric(get.fitskey(key=c("CRPIX1","CRPIX2"), hdr=hdr))
+    if(!is.na(xlo)){
+        if(!is.na(wcspix[1])){
+            wcspix[1] = wcspix[1] - xlo + 1
+            hdr = put.fitskey(key="CRPIX1", value=wcspix[1], hdr=hdr)
+        }
+    }
+    if(!is.na(ylo)){
+        if(!is.na(wcspix[2])){
+            wcspix[2] = wcspix[2] - ylo + 1
+            hdr = put.fitskey(key="CRPIX2", value=wcspix[2], hdr=hdr)
+        }
+    }
     
     # master files
     hlist = list(hdr)
@@ -20,7 +35,7 @@ read.fits = function(file, hdu = 0, comments = TRUE, strip = c(" ","'"," "), xlo
     while(xhdu & thdu>nhdu){
         
         # read header
-        hdr = .read.fits.hdr(fcon, comments=comments, strip=strip)
+        hdr = .read.fits.hdr(fcon, comments=comments, strip=strip, maxlines=maxlines)
         
         # check hdu exists
         if(length(hdr)==1){
@@ -37,6 +52,21 @@ read.fits = function(file, hdu = 0, comments = TRUE, strip = c(" ","'"," "), xlo
                 du = .read.fits.table(fcon, hdr)
             }else{
                 du = .read.fits.image(fcon, hdr, xlo, xhi, ylo, yhi)
+            }
+            
+            # correct hdr for WCS information if present and if cutting image
+            wcspix = as.numeric(get.fitskey(key=c("CRPIX1","CRPIX2"), hdr=hdr))
+            if(!is.na(xlo)){
+                if(!is.na(wcspix[1])){
+                    wcspix[1] = wcspix[1] - xlo + 1
+                    hdr = put.fitskey(key="CRPIX1", value=wcspix[1], hdr=hdr)
+                }
+            }
+            if(!is.na(ylo)){
+                if(!is.na(wcspix[2])){
+                    wcspix[2] = wcspix[2] - ylo + 1
+                    hdr = put.fitskey(key="CRPIX2", value=wcspix[2], hdr=hdr)
+                }
             }
             
             # add to masters
@@ -64,87 +94,7 @@ read.fits = function(file, hdu = 0, comments = TRUE, strip = c(" ","'"," "), xlo
     
 }
 
-read.fitshdr = function(file, hdu = 1, comments = TRUE){
-    
-    if(hdu==1){
-        
-        # open file
-        fcon = file(file, "rb")
-        
-        # read primary header
-        hdr = .read.fits.hdr(fcon, comments=comments)
-        
-        # close file
-        close(fcon)
-        
-    }else{
-        
-        # read and return header
-        dat = read.fits(file, hdu=hdu, comments=comments)
-        hdr = dat$hdr[[1]]
-        
-    }
-    
-    # return header
-    return(hdr)
-    
-}
-
-read.fitskey = function(key, file, hdu = 1){
-    
-    if(hdu==1){
-        
-        # open file
-        fcon = file(file, "rb")
-        
-        # read primary header
-        hdr = .read.fits.hdr(fcon, comments=FALSE)
-        
-        # close file
-        close(fcon)
-        
-    }else{
-        
-        # read and return header
-        dat = read.fits(file, hdu=hdu, comments=FALSE)
-        hdr = dat$hdr[[1]]
-        
-    }
-    
-    # locate keys
-    out = {}
-    keys = hdr[,"key"]
-    for(i in 1:length(key)){
-        if(key[i]%in%keys){
-            k = as.vector(hdr[which(keys==key[i]),"value"])
-        }else{
-            k = NA
-        }
-        out = c(out,k)
-    }
-    
-    # return keys
-    return(out)
-    
-}
-
-read.fitsim = function(file, hdu = 1, xlo = NA, xhi = NA, ylo = NA, yhi = NA){
-    
-    # read and return FITS image
-    dat = read.fits(file, hdu=hdu, comments=FALSE, xlo=xlo, xhi=xhi, ylo=ylo, yhi=yhi)
-    return(dat$dat[[1]])
-    
-}
-
-read.fitstab = function(file, hdu=2){
-    
-    # read and return FITS table
-    dat = read.fits(file, hdu=hdu, comments=FALSE)
-    return(dat$dat[[1]]$table)
-    
-}
-
-.read.fits.hdr = function(fcon, comments=TRUE, strip=c(" ","'"," "), maxlines=5000){
+.read.fits.hdr = function(fcon, comments=TRUE, strip=c(" ","'"," "), maxlines=50000){
     
     # setup
     hdr = character()
@@ -294,6 +244,7 @@ read.fitstab = function(file, hdu=2){
                     seek(fcon, where = (naxisn[1] - length(xcols)) * bsize, origin = "current")
                 }
             }
+            dimnames(dat)[[2]] = NULL
             finish = (naxisn[1] * (naxisn[2] - yhi)) + (naxisn[1] - xhi)
             if(finish != 0){seek(fcon, where = finish*bsize, origin = "current")}
         }else{
@@ -527,7 +478,4 @@ read.fitstab = function(file, hdu=2){
     return(list(meta=meta,table=table))
     
 }
-
-
-
 

@@ -12,7 +12,7 @@
   \item{re}{half-light radius}
   \item{n}{Sersic index}
   \item{e}{ellipticity (1 - b/a)}
-  \item{r}{radius}
+  \item{r}{radius of interest}
 }
 
 \value{

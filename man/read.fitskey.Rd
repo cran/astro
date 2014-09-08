@@ -5,12 +5,16 @@
 
 \description{The mid-level function 'read.fitskey' allows FITS header keywords to be read directly into R.}
 
-\usage{read.fitskey(key, file, hdu = 1)}
+\usage{read.fitskey(key, file, hdu = 1, comments = FALSE, 
+             strip = c(" ","'"," "), maxlines = 50000)}
 
 \arguments{
   \item{key}{header keyword (may be a vector)}
   \item{file}{file name}
   \item{hdu}{header and data unit to be read}
+  \item{comments}{output header comments?}
+  \item{strip}{lead/trail characters stripped from header 'value' data}
+  \item{maxlines}{maximum number of header lines}
 }
 
 \details{

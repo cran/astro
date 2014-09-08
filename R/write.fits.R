@@ -29,6 +29,7 @@ write.fits = function(x, file = "star.fits", type = "single", hdu = 0){
         }
         h = hdr[[i]]
         naxis = length(dim(d))
+        
         type = tolower(substr(type, 1, 1))
         
         if(!is.na(h[1]) & type=="a"){
@@ -89,7 +90,7 @@ write.fits = function(x, file = "star.fits", type = "single", hdu = 0){
         if(!is.null(d)){
             
             # write primary data unit
-            writeBin(as.vector(d), fcon, size = size, endian = "big")
+            writeBin64(as.vector(d), fcon, size = size, endian = "big")
             
             # pad rest of record with zeros
             pad = raw(2880 - (length(as.vector(d)) * size)%%2880)
@@ -101,51 +102,6 @@ write.fits = function(x, file = "star.fits", type = "single", hdu = 0){
     
     # close file
     close(fcon)
-    
-}
-
-write.fitshdr = function(hdr, file, hdu = 1){
-    
-    # read in original file
-    x = read.fits(file, hdu=0, comments=TRUE, strip=c(" ","'"," "))
-    
-    # comments?
-    if(length(hdr[1,])==2){
-        hdr = cbind(hdr,comment="")
-    }
-    
-    # update x
-    x$hdr[[hdu]] = hdr
-    
-    # write new file
-    write.fits(x, file = file, type = "auto")
-    
-}
-
-write.fitskey = function(key, value, file, comment = "", hdu = 1){
-    
-    # read in original file
-    x = read.fits(file=file, hdu=0, comments=TRUE, strip=c(" ","'"," "))
-    
-    # check for key and add to hdr
-    h = x$hdr[[hdu]]
-    k = key
-    v = m = character(length(k))
-    if(length(value)>0){v[1:min(c(length(k),length(value)))] = value[1:min(c(length(k),length(value)))]}
-    if(length(comment)>0){m[1:min(c(length(k),length(comment)))] = comment[1:min(c(length(k),length(comment)))]}
-    for(i in 1:length(k)){
-        if(k[i]%in%h[,"key"] & k[i]!="COMMENT" & k[i]!="HISTORY"){
-            col = which(h[,"key"]==k[i])
-            h[col,"value"] = v[i]
-            h[col,"comment"] = m[i]
-        }else{
-            h = rbind(h,c(k[i],v[i],m[i]))
-        }
-    }
-    x$hdr[[hdu]] = h
-    
-    # write out new file with updated header
-    write.fits(x=x, file=file, type="auto")
     
 }
 
@@ -340,11 +296,4 @@ write.fitskey = function(key, value, file, comment = "", hdu = 1){
     return(hdr)
     
 }
-
-
-
-
-
-
-
 

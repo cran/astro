@@ -5,11 +5,13 @@
 
 \description{The mid-level function 'read.fitstab' allows FITS binary tables to be read directly into R.}
 
-\usage{read.fitstab(file, hdu = 2)}
+\usage{read.fitstab(file, hdu = 2, strip = c(" ","'"," "), maxlines = 50000)}
 
 \arguments{
   \item{file}{file name}
   \item{hdu}{header and data unit to be read}
+  \item{strip}{lead/trail characters stripped from header 'value' data}
+  \item{maxlines}{maximum number of header lines}
 }
 
 \details{

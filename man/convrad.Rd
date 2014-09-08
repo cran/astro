@@ -9,7 +9,7 @@
 
 \arguments{
   \item{n}{Sersic index}
-  \item{f}{desired flux fraction at reference radius}
+  \item{f}{flux fraction at new radius}
   \item{r}{reference radius}
   \item{fr}{flux fraction at reference radius}
 }

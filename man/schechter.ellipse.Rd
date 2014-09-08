@@ -2,20 +2,21 @@
 \alias{schechter.ellipse}
 \alias{.schechter.ellipse.fit}
 
-\title{Calculate Error Matrices for a Schechter Function fit}
+\title{Calculate Error Matrices for a Schechter Function Fit}
 
 \description{This function calculates ellipsoidal error matrices for a given Schechter Function fit.}
 
-\usage{schechter.ellipse(data, knee, slope, norm, chi2, datarange = NA, 
-                  kneerange = c(-24,-16), sloperange = c(-2,1.5), 
-                  kneeofflims = NA, slopeofflims = NA, kneestep = 0.5, 
-                  slopestep = 0.1, kneesteps = NA, slopesteps = NA, 
-                  lim1 = NA, lim2 = NA, numlim = 1, method = "nlminb", 
-                  volume = 1, bw = 0.1, mag = FALSE, log = FALSE, 
-                  null = 1E-9, ...)}
+\usage{schechter.ellipse(data, vmax = NA, knee, slope, norm, chi2, 
+                  datarange = NA, kneerange = c(-24,-16), 
+                  sloperange = c(-2,1.5), kneeofflims = NA, 
+                  slopeofflims = NA, kneestep = 0.5, slopestep = 0.1, 
+                  kneesteps = NA, slopesteps = NA, lim1 = NA, lim2 = NA, 
+                  numlim = 1, method = "nlminb", volume = max(vmax), 
+                  bw = 0.1, mag = FALSE, log = FALSE, null = 1E-9, ...)}
 
 \arguments{
   \item{data}{input data vector}
+  \item{vmax}{vector of maximum comoving volumes within which object could lie}
   \item{knee}{the knees(s) of the Schechter function (L_star/M_star)}
   \item{slope}{the slope(s) of the Schechter function (alpha)}
   \item{norm}{the normalisation(s) of the Schechter function (phi_star)}
@@ -33,7 +34,7 @@
   \item{lim2}{upper data limit for fitting}
   \item{numlim}{lower number (per bin) limit for fitting}
   \item{method}{choice of 'nlminb' (recommended) or one of 'optim's minimisation methods (e.g., 'Nelder-Mead')}
-  \item{volume}{volume across which the data has been collected}
+  \item{volume}{total volume across which the data has been collected (default 1 if vmax = NA)}
   \item{bw}{bin width sizes}
   \item{mag}{are the input data magnitudes?}
   \item{log}{are the input data logged?}

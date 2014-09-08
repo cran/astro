@@ -3,7 +3,7 @@
 
 \title{Astro:Beta Distribution (quantile)}
 
-\description{An astro wrapper around the 'qbeta' function.}
+\description{An astro wrapper around the 'qbeta' function. Useful for calculating robust upper and lower error boundaries for a given data set.}
 
 \usage{aqbeta(k, n, s = c(-1,1), p = NA, corr = TRUE, ...)}
 
@@ -24,7 +24,7 @@ When 'p' is equal to <NA> (default), sigma confidence intervals are calculated a
 Cameron, E., 2011, Publications of the Astronomical Society of Australia (PASA),  28, 128
 }
 
-\author{Ewan Cameron <cameron@phys.ethz.ch>
+\author{Ewan Cameron <dr.ewan.cameron@gmail.com>
 
 Aaron Robotham <aaron.robotham@icrar.org>
 

@@ -3,7 +3,7 @@
 
 \title{Strip Leading/Trailing Characters}
 
-\description{Strips leading/trailing characters from the input string.}
+\description{Strips leading/trailing characters from the input string. Particularly useful for extracting information from FITS file headers which are embedded in a complex string, for example.}
 
 \usage{strip(x, strip = " ")}
 

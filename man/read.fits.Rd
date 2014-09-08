@@ -10,13 +10,14 @@
 \description{The generic function 'read.fits' allows FITS binary tables and images (including headers) to be read directly into R.}
 
 \usage{read.fits(file, hdu = 0, comments = TRUE, strip = c(" ","'"," "), 
-          xlo = NA, xhi = NA, ylo = NA, yhi = NA)}
+          maxlines = 50000, xlo = NA, xhi = NA, ylo = NA, yhi = NA)}
 
 \arguments{
   \item{file}{file name}
   \item{hdu}{header and data unit to be read (0 = all)}
   \item{comments}{output header comments?}
   \item{strip}{lead/trail characters stripped from header 'value' data}
+  \item{maxlines}{maximum number of header lines}
   \item{xlo}{lower x pixel sub-region (image only)}
   \item{xhi}{upper x pixel sub-region (image only)}
   \item{ylo}{lower y pixel sub-region (image only)}

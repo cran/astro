@@ -5,12 +5,15 @@
 
 \description{The mid-level function 'read.fitshdr' allows FITS headers to be read directly into R.}
 
-\usage{read.fitshdr(file, hdu = 1, comments = TRUE)}
+\usage{read.fitshdr(file, hdu = 1, comments = TRUE, 
+             strip = c(" ","'"," "), maxlines = 50000)}
 
 \arguments{
   \item{file}{file name}
   \item{hdu}{header and data unit to be read}
   \item{comments}{output header comments?}
+  \item{strip}{lead/trail characters stripped from header 'value' data}
+  \item{maxlines}{maximum number of header lines}
 }
 
 \details{

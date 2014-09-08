@@ -32,7 +32,7 @@ Code and inspiration from the FITSio package <http://cran.r-project.org/web/pack
 }
 
 \author{
-Lee Kelvin, Andrew Harris
+Lee Kelvin, Andrew Harris, Aaron Robotham
 
 Maintainer: Lee Kelvin <lee.kelvin@uibk.ac.at>
 }

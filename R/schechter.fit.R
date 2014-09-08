@@ -1,22 +1,36 @@
-schechter.fit = function(data, knee, slope, norm, knee.alt = NA, slope.alt = NA, norm.alt = NA, kneelo = -Inf, slopelo = -Inf, normlo = 0, kneehi = Inf, slopehi = Inf, normhi = Inf, fixk1 = FALSE, fixs1 = FALSE, fixn1 = FALSE, fixk2 = FALSE, fixs2 = FALSE, fixn2 = FALSE, range = range(data), lim1 = NA, lim2 = NA, numlim = 1, method = "nlminb", volume = 1, bw = 0.1, mag = FALSE, log = FALSE, null = 1E-9, error = "jack", subvol = 10, sampnum = subvol, msun = solar("r"), ...){
+schechter.fit = function(data, vmax = NA, knee, slope, norm, knee.alt = NA, slope.alt = NA, norm.alt = NA, kneelo = -Inf, slopelo = -Inf, normlo = 0, kneehi = Inf, slopehi = Inf, normhi = Inf, fixk1 = FALSE, fixs1 = FALSE, fixn1 = FALSE, fixk2 = FALSE, fixs2 = FALSE, fixn2 = FALSE, range = range(data), lim1 = NA, lim2 = NA, numlim = 1, method = "nlminb", volume = max(vmax), bw = 0.1, mag = FALSE, log = FALSE, null = 1E-9, error = "jack", subvol = 10, sampnum = subvol, msun = solar("r")){
     
     # setup
     range = sort(range)
+    if(is.na(volume[1])){volume = 1}
+    if(is.na(lim1)){lim1 = min(data)}
+    if(is.na(lim2)){lim2 = max(data)}
     
 #    # export
-#    .schechter.fit.bin = astro:::.schechter.fit.bin
 #    .schechter.fit.dat = astro:::.schechter.fit.dat
 #    .schechter.fit.chi = astro:::.schechter.fit.chi
     
     # schechter bin calculations
-    bindat = .schechter.fit.bin(data=data, range=range, lim1=lim1, lim2=lim2, numlim=numlim, volume=volume, bw=bw, null=null)
+    bindat = schechter.bin(data=data, vmax=vmax, range=range, lim1=lim1, lim2=lim2, numlim=numlim, volume=volume, bw=bw, null=null)
     
     # only continue if any data points remain
     if(length(bindat$fitden)>0){
         
         fitdat = .schechter.fit.dat(bindat=bindat, knee=knee, slope=slope, norm=norm, knee.alt=knee.alt, slope.alt=slope.alt, norm.alt=norm.alt, kneelo=kneelo, slopelo=slopelo, normlo=normlo, kneehi=kneehi, slopehi=slopehi, normhi=normhi, method=method, bw=bw, mag=mag, log=log, fixk1=fixk1, fixs1=fixs1, fixn1=fixn1, fixk2=fixk2, fixs2=fixs2, fixn2=fixn2, msun=msun)
         
+        
+        ##### change error bin checking below to account for multiple galaxies in 1 bin #####
+        
+        
         # errors?
+        ndata = length(which(data>lim1 & data<lim2))
+        if(ndata == 1){
+            warning(paste("Insufficient data, error estimates unavailable"))
+            error = "pass"
+        }else if(ndata < subvol){
+            warning(paste("Insufficient data, lowering subvol to",ndata))
+            subvol = ndata
+        }
         if(error=="jack"){
             
             # jack setup
@@ -28,11 +42,13 @@ schechter.fit = function(data, knee, slope, norm, knee.alt = NA, slope.alt = NA,
             for(l in jacklist){
                 
                 # setup
-                cat("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b",l,"/",(length(subvols)-1),"")
+                toprint = paste(l,"/",(length(subvols)-1),"",sep=" ")
+                todelete = rep("\b",nchar(toprint))
+                cat(todelete,toprint,sep="")
                 jackdat = data[-(subvols[l]:subvols[l+1])]
                 
                 # jackknifed binned data
-                jackbin = .schechter.fit.bin(data=jackdat, range=range, lim1=lim1, lim2=lim2, numlim=numlim, volume=volume, bw=bw, null=null)
+                jackbin = schechter.bin(data=jackdat, vmax=vmax, range=range, lim1=lim1, lim2=lim2, numlim=numlim, volume=volume, bw=bw, null=null)
                 
                 # jackknifed fitted data
                 jackfit = .schechter.fit.dat(bindat=jackbin, knee=knee, slope=slope, norm=norm, knee.alt=knee.alt, slope.alt=slope.alt, norm.alt=norm.alt, kneelo=kneelo, slopelo=slopelo, normlo=normlo, kneehi=kneehi, slopehi=slopehi, normhi=normhi, method=method, bw=bw, mag=mag, log=log, fixk1=fixk1, fixs1=fixs1, fixn1=fixn1, fixk2=fixk2, fixs2=fixs2, fixn2=fixn2, msun=msun)
@@ -42,12 +58,16 @@ schechter.fit = function(data, knee, slope, norm, knee.alt = NA, slope.alt = NA,
                     pars = jackfit$par
                     js = jackfit$j
                     chi2s = jackfit$chi2
+                    dofs = jackfit$dof
                     rchi2s = jackfit$rchi2
+                    pvals = jackfit$pvals
                 }else{
                     pars = rbind(pars, jackfit$par)
                     js = c(js, jackfit$j)
                     chi2s = c(chi2s, jackfit$chi2)
+                    dofs = c(dofs, jackfit$dof)
                     rchi2s = c(rchi2s, jackfit$rchi2)
+                    pvals = c(pvals, jackfit$pval2)
                 }
                 
             }
@@ -108,12 +128,12 @@ schechter.fit = function(data, knee, slope, norm, knee.alt = NA, slope.alt = NA,
         }
         
         # build data list
-        dat = list(binmid=bindat$binmid, num=bindat$num, den=bindat$den, err=bindat$err, errlo=bindat$errlo, errhi=bindat$errhi, par=fitdat$par, parlo=parlo, parhi=parhi, j=fitdat$j, jlo=jlo, jhi=jhi, chi2=fitdat$chi2, dof=fitdat$dof, rchi2=fitdat$rchi2, denlim=(numlim/volume)/bw, hessian=fitdat$hessian)
+        dat = list(binmid=bindat$binmid, num=bindat$num, den=bindat$den, err=bindat$err, errlo=bindat$errlo, errhi=bindat$errhi, par=fitdat$par, parlo=parlo, parhi=parhi, j=fitdat$j, jlo=jlo, jhi=jhi, chi2=fitdat$chi2, dof=fitdat$dof, rchi2=fitdat$rchi2, pval=fitdat$pval, denlim=(numlim/volume)/bw, hessian=fitdat$hessian)
         
     }else{
         
         warning("No data available for fitting, check limits")
-        dat = list(binmid=NA, num=NA, den=NA, err=NA, errlo=NA, errhi=NA, par=NA, parlo=NA, parhi=NA, j=NA, jlo=NA, jhi=NA, chi2=NA, dof=NA, rchi2=NA, denlim=NA, hessian=NA)
+        dat = list(binmid=NA, num=NA, den=NA, err=NA, errlo=NA, errhi=NA, par=NA, parlo=NA, parhi=NA, j=NA, jlo=NA, jhi=NA, chi2=NA, dof=NA, rchi2=NA, pval=NA, denlim=NA, hessian=NA)
         
     }
     
@@ -215,99 +235,12 @@ schechter.fit = function(data, knee, slope, norm, knee.alt = NA, slope.alt = NA,
     chi2 = chi
     dof = (length(bindat$fitden)-length(par))
     rchi2 = chi2/dof
+    probs = seq(0,1,len=101)
+    qchi2 = qchisq(probs,df=dof)
+    pval = probs[which.min(abs(qchi2-chi2))]
     
     # return results
-    return(list(par=par, j=j, chi2=chi2, dof=dof, rchi2=rchi2, hessian=hessian))
-    
-}
-
-# calculate number (total), number density (phi) and poissonian errors
-.schechter.fit.bin = function(data, range, lim1, lim2, numlim, volume, bw, null){
-    
-    # data vectors
-    bins = seq(range[1], range[2], by=bw)
-    binmid = bins[-1]-(bw/2)
-    binlo = bins[1:(length(bins)-1)]
-    binhi = bins[2:length(bins)]
-    
-    # calculate bin sample statistics
-    num = {}
-    den = {}
-    err = {}
-    for(i in 1:length(binmid)){
-        
-        # sub-sample
-        samp = data[data>binlo[i] & data<binhi[i]]
-        
-        # calculate bin values
-        sampnum = length(samp)
-        sampden = (sampnum/volume)/bw
-        samperr = (sqrt(sampnum)/volume)/bw
-        
-        # add to data vectors
-        num = c(num,sampnum)
-        den = c(den,sampden)
-        err = c(err,samperr)
-        
-    }
-
-    # calculate upper and lower errors
-    errlo = den-err
-    errhi = den+err
-    if(any(errlo==0)){
-        errlo[which(errlo==0)] = null
-    }
-    if(any(errhi==0)){
-        errhi[which(errhi==0)] = null
-    }
-
-    # schechter (to be) fit values
-    if(any(num<=numlim)){
-        bad = which(num<=numlim)
-        fitbinmid = binmid[-bad]
-        fitbinlo = binlo[-bad]
-        fitbinhi = binhi[-bad]
-        fitnum = num[-bad]
-        fitden = den[-bad]
-        fiterr = err[-bad]
-        fiterrlo = errlo[-bad]
-        fiterrhi = errhi[-bad]
-    }else{
-        fitbinmid = binmid
-        fitbinlo = binlo
-        fitbinhi = binhi
-        fitnum = num
-        fitden = den
-        fiterr = err
-        fiterrlo = errlo
-        fiterrhi = errhi
-    }
-
-    # impose any upper and lower limits
-    bad = {}
-    if(!is.na(lim1)){
-        if(any(fitbinlo<lim1)){
-            bad = c(bad,which(fitbinlo<lim1))
-        }
-    }
-    if(!is.na(lim2)){
-        if(any(fitbinhi>lim2)){
-            bad = c(bad,which(fitbinhi>lim2))
-        }
-    }
-    if(length(bad)>0){
-        fitbinmid = fitbinmid[-bad]
-        fitbinlo = fitbinlo[-bad]
-        fitbinhi = fitbinhi[-bad]
-        fitnum = fitnum[-bad]
-        fitden = fitden[-bad]
-        fiterr = fiterr[-bad]
-        fiterrlo = fiterrlo[-bad]
-        fiterrhi = fiterrhi[-bad]
-    }
-    
-    # return results
-    return(list(bins=bins, binmid=binmid, binlo=binlo, binhi=binhi, num=num, den=den, err=err, errlo=errlo, errhi=errhi, fitbinmid=fitbinmid, fitbinlo=fitbinlo, fitbinhi=fitbinhi, fitnum=fitnum, fitden=fitden, fiterr=fiterr, fiterrlo=fiterrlo, fiterrhi=fiterrhi))
+    return(list(par=par, j=j, chi2=chi2, dof=dof, rchi2=rchi2, pval=pval, hessian=hessian))
     
 }
 

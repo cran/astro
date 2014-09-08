@@ -10,7 +10,7 @@
 \details{
 The astro package provides a series of functions, tools and routines in everyday use within astronomy.
 
-Broadly speaking, one may group these functions into 4 main areas, namely; cosmology, FITS file manipulation, the Sersic function and general (plotting and scripting) tools. A summary of these sub-packages and their functions is as follows:
+Broadly speaking, one may group these functions into 7 main areas, namely: cosmology, FITS file manipulation, the Sersic function, plotting, data manipulation, statistics and general convenience functions and scripting tools. An overview of these sub-packages and their functions is as follows:
 
 \subsection{Cosmology}{
 
@@ -50,6 +50,10 @@ Read FITS image: \code{\link{read.fitsim}},
 
 Read FITS table: \code{\link{read.fitstab}},
 
+Get FITS keyword value: \code{\link{get.fitskey}},
+
+Put FITS keyword value: \code{\link{put.fitskey}},
+
 Write FITS files: \code{\link{write.fits}},
 
 Write FITS header: \code{\link{write.fitshdr}},
@@ -57,6 +61,8 @@ Write FITS header: \code{\link{write.fitshdr}},
 Write FITS key: \code{\link{write.fitskey}},
 
 Plot FITS images: \code{\link{plotfits}},
+
+Write large binary files: \code{\link{writeBin64}},
 
 Strip leading/trailing characters: \code{\link{strip}}
 
@@ -74,7 +80,7 @@ Convert half-light radius to scalelength: \code{\link{re2h}},
 
 Convert scalelength to half-light radius: \code{\link{h2re}},
 
-The incomplete gamma function: \code{\link{igamma}},
+Calculate a combined half-light radius: \code{\link{combrad}},
 
 Central Concentration: \code{\link{concen}},
 
@@ -90,7 +96,7 @@ Kron radius: \code{\link{kronrad}}
 
 }
 
-\subsection{General}{
+\subsection{Plotting}{
 
 Astro plot: \code{\link{aplot}},
 
@@ -100,27 +106,7 @@ Astro colourbar: \code{\link{acb}},
 
 Astro box: \code{\link{abox}},
 
-Astro kernel density estimator: \code{\link{akde2d}},
-
-Astro qbeta function: \code{\link{aqbeta}},
-
 Astro alpha-transparency colour conversion: \code{\link{acol}},
-
-The Gaussian Function: \code{\link{gauss}},
-
-Fit to the Gaussian Function: \code{\link{gauss.fit}},
-
-The Schechter Function: \code{\link{schechter}},
-
-Fit to the Schechter Function: \code{\link{schechter.fit}},
-
-Error ellipses for a Schechter fit: \code{\link{schechter.ellipse}},
-
-Absolute Magnitude of the Sun: \code{\link{solar}},
-
-The Luminosity Density: \code{\link{lumdens}},
-
-Central Angle: \code{\link{cenang}},
 
 Ellipse: \code{\link{ellipse}},
 
@@ -128,17 +114,59 @@ Plot labelling: \code{\link{label}},
 
 Plot shading: \code{\link{shade}},
 
-Human-readable time strings: \code{\link{nicetime}},
-
-For-loop ETA: \code{\link{eta}},
-
-Sigma-clipped mean: \code{\link{scmean}},
-
 Shadowed text: \code{\link{shadowtext}},
 
 Cardinal points: \code{\link{cardinal}},
 
 Scale marks: \code{\link{scalemark}}
+
+}
+
+\subsection{Data}{
+
+Astro kernel density estimator: \code{\link{akde2d}},
+
+The Gaussian Function: \code{\link{gauss}},
+
+The Schechter Function: \code{\link{schechter}},
+
+The Luminosity Density: \code{\link{lumdens}},
+
+Calculate Schechter Function Binned Variables: \code{\link{schechter.bin}},
+
+Fit to the Schechter Function: \code{\link{schechter.fit}},
+
+Error ellipses for a Schechter fit: \code{\link{schechter.ellipse}}
+
+}
+
+\subsection{Statistics}{
+
+Chi-Squared Probability Density Function: \code{\link{chipdf}},
+
+Chi-Squared Cumulative Distribution Function: \code{\link{chicdf}},
+
+Chi-Squared P-Value: \code{\link{chipval}},
+
+Calculate the chi-squared statistic for a given p-value: \code{\link{chipval}},
+
+The incomplete gamma function: \code{\link{igamma}},
+
+Astro qbeta function: \code{\link{aqbeta}}, 
+
+Sigma-clipped mean: \code{\link{scmean}}
+
+}
+
+\subsection{Miscellaneous}{
+
+Absolute Magnitude of the Sun: \code{\link{solar}},
+
+Central Angle: \code{\link{cenang}},
+
+Human-readable time strings: \code{\link{nicetime}},
+
+For-loop ETA: \code{\link{eta}}
 
 }
 

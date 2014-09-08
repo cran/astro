@@ -1,6 +1,5 @@
 \name{schechter.fit}
 \alias{schechter.fit}
-\alias{.schechter.fit.bin}
 \alias{.schechter.fit.dat}
 \alias{.schechter.fit.chi}
 
@@ -8,17 +7,19 @@
 
 \description{This function calculates a Schechter function fit to a set of input data.}
 
-\usage{schechter.fit(data, knee, slope, norm, knee.alt = NA, slope.alt = NA, 
-              norm.alt = NA, kneelo = -Inf, slopelo = -Inf, normlo = 0, 
-              kneehi = Inf, slopehi = Inf, normhi = Inf, fixk1 = FALSE, 
-              fixs1 = FALSE, fixn1 = FALSE, fixk2 = FALSE, fixs2 = FALSE, 
-              fixn2 = FALSE, range = range(data), lim1 = NA, lim2 = NA, 
-              numlim = 1, method = "nlminb", volume = 1, bw = 0.1, 
+\usage{schechter.fit(data, vmax = NA, knee, slope, norm, knee.alt = NA, 
+              slope.alt = NA, norm.alt = NA, kneelo = -Inf, 
+              slopelo = -Inf, normlo = 0, kneehi = Inf, slopehi = Inf, 
+              normhi = Inf, fixk1 = FALSE, fixs1 = FALSE, fixn1 = FALSE, 
+              fixk2 = FALSE, fixs2 = FALSE, fixn2 = FALSE, 
+              range = range(data), lim1 = NA, lim2 = NA, numlim = 1, 
+              method = "nlminb", volume = max(vmax), bw = 0.1, 
               mag = FALSE, log = FALSE, null = 1E-9, error = "jack", 
-              subvol = 10, sampnum = subvol, msun = solar("r"), ...)}
+              subvol = 10, sampnum = subvol, msun = solar("r"))}
 
 \arguments{
   \item{data}{input data vector}
+  \item{vmax}{vector of maximum comoving volumes within which object could lie}
   \item{knee}{the knees(s) of the Schechter function (L_star/M_star)}
   \item{slope}{the slope(s) of the Schechter function (alpha)}
   \item{norm}{the normalisation(s) of the Schechter function (phi_star)}
@@ -42,7 +43,7 @@
   \item{lim2}{upper data limit for fitting}
   \item{numlim}{lower number (per bin) limit for fitting}
   \item{method}{choice of 'nlminb' (recommended) or one of 'optim's minimisation methods (e.g., 'Nelder-Mead')}
-  \item{volume}{volume across which the data has been collected}
+  \item{volume}{total volume across which the data has been collected (default 1 if vmax = NA)}
   \item{bw}{bin width sizes}
   \item{mag}{are the input data magnitudes?}
   \item{log}{are the input data logged?}
@@ -51,7 +52,6 @@
   \item{subvol}{number of sub-volumes to split the input data into}
   \item{sampnum}{number of samplings to be made for bootstrapping method}
   \item{msun}{absolute magnitude of the sun (to be used in calculation of the luminosity density should mag=TRUE)}
-  \item{...}{additional arguments to be passed to 'integrate'}
 }
 
 \value{
@@ -70,6 +70,7 @@
   \item{chi2}{chi2 value}
   \item{dof}{number of degrees of freedom}
   \item{rchi2}{reduced chi2}
+  \item{pval}{probability of observing chi2 value by chance [significant: pval < 0.05]}
   \item{denlim}{lower density limit used}
   \item{hessian}{optim hessian output}
 }

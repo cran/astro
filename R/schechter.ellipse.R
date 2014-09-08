@@ -1,4 +1,4 @@
-schechter.ellipse = function(data, knee, slope, norm, chi2, datarange = NA, kneerange = c(-24,-16), sloperange = c(-2,1.5), kneeofflims = NA, slopeofflims = NA, kneestep = 0.5, slopestep = 0.1, kneesteps = NA, slopesteps = NA, lim1 = NA, lim2 = NA, numlim = 1, method = "nlminb", volume = 1, bw = 0.1, mag = FALSE, log = FALSE, null = 1E-9, ...){
+schechter.ellipse = function(data, vmax = NA, knee, slope, norm, chi2, datarange = NA, kneerange = c(-24,-16), sloperange = c(-2,1.5), kneeofflims = NA, slopeofflims = NA, kneestep = 0.5, slopestep = 0.1, kneesteps = NA, slopesteps = NA, lim1 = NA, lim2 = NA, numlim = 1, method = "nlminb", volume = max(vmax), bw = 0.1, mag = FALSE, log = FALSE, null = 1E-9, ...){
     
     #load("../vollim.img"); data = dat[dat[,"R_SERSIC"]>-50,"R_SERSIC"]; knee = c(-20.810520443); slope = c(-1.098815208, 0.657166733); norm = c(0.005030941, 0.002933632); chi2=34.716425374; kneerange = c(-24,-15); sloperange = c(-2,1.5); kneestep=1; slopestep=0.5; lim1=NA; lim2=-17.4; numlim=3; method="nlminb"; volume=224555.3; bw=0.25; mag=TRUE; log=FALSE; null = 1E-9
     
@@ -14,6 +14,9 @@ schechter.ellipse = function(data, knee, slope, norm, chi2, datarange = NA, knee
 #        slope = rep(slope,max(lengths))[1:max(lengths)]
 #        norm = rep(norm,max(lengths))[1:max(lengths)]
 #    }
+    
+    # volume
+    if(is.na(volume[1])){volume = 1}
     
     # data range check
     if(is.na(datarange[1])){
@@ -52,7 +55,7 @@ schechter.ellipse = function(data, knee, slope, norm, chi2, datarange = NA, knee
     grid = fullgrid
     
     # run error fitting subroutine
-    res = .schechter.ellipse.fit(grid=grid, data=data, knee=knee, slope=slope, norm=norm, datarange=datarange, lim1=lim1, lim2=lim2, numlim=numlim, method=method, volume=volume, bw=bw, mag=mag, log=log, null=null)
+    res = .schechter.ellipse.fit(grid=grid, vmax=vmax, data=data, knee=knee, slope=slope, norm=norm, datarange=datarange, lim1=lim1, lim2=lim2, numlim=numlim, method=method, volume=volume, bw=bw, mag=mag, log=log, null=null)
     
     # construct res1 and res2 (if applicable) error matrices
     res1 = t(matrix(res$res1, ncol=length(knees), nrow=length(slopes), byrow=TRUE))
@@ -110,7 +113,7 @@ schechter.ellipse = function(data, knee, slope, norm, chi2, datarange = NA, knee
     
 }
 
-.schechter.ellipse.fit = function(grid, data, knee, slope, norm, datarange, lim1, lim2, numlim, method, volume, bw, mag, log, null){
+.schechter.ellipse.fit = function(grid, vmax, data, knee, slope, norm, datarange, lim1, lim2, numlim, method, volume, bw, mag, log, null){
     
     # inputs lengths
     lengths = c(length(knee), length(slope), length(norm))
@@ -141,7 +144,7 @@ schechter.ellipse = function(data, knee, slope, norm, chi2, datarange = NA, knee
                 s[1] = vars[,2]
                 
                 # fit function
-                fit = schechter.fit(data=data, knee=k, slope=s, norm=norm, range=datarange, lim1=lim1, lim2=lim2, numlim=numlim, method=method, volume=volume, bw=bw, mag=mag, log=log, null=null, fixk1=TRUE, fixs1=TRUE, error="none")
+                fit = schechter.fit(data=data, vmax=vmax, knee=k, slope=s, norm=norm, range=datarange, lim1=lim1, lim2=lim2, numlim=numlim, method=method, volume=volume, bw=bw, mag=mag, log=log, null=null, fixk1=TRUE, fixs1=TRUE, error="none")
                 
                 # add chi2 to results
                 res1 = c(res1, fit$chi2)
@@ -156,9 +159,9 @@ schechter.ellipse = function(data, knee, slope, norm, chi2, datarange = NA, knee
                 
                 # fit function
                 if(length(knee)==1){
-                    fit = schechter.fit(data=data, knee=k, slope=s, norm=norm, range=datarange, lim1=lim1, lim2=lim2, numlim=numlim, method=method, volume=volume, bw=bw, mag=mag, log=log, null=null, fixk1=TRUE, fixs2=TRUE, error="none")
+                    fit = schechter.fit(data=data, vmax=vmax, knee=k, slope=s, norm=norm, range=datarange, lim1=lim1, lim2=lim2, numlim=numlim, method=method, volume=volume, bw=bw, mag=mag, log=log, null=null, fixk1=TRUE, fixs2=TRUE, error="none")
                 }else{
-                    fit = schechter.fit(data=data, knee=k, slope=s, norm=norm, range=datarange, lim1=lim1, lim2=lim2, numlim=numlim, method=method, volume=volume, bw=bw, mag=mag, log=log, null=null, fixk2=TRUE, fixs2=TRUE, error="none")
+                    fit = schechter.fit(data=data, vmax=vmax, knee=k, slope=s, norm=norm, range=datarange, lim1=lim1, lim2=lim2, numlim=numlim, method=method, volume=volume, bw=bw, mag=mag, log=log, null=null, fixk2=TRUE, fixs2=TRUE, error="none")
                 }
                 
                 # add chi2 to results
